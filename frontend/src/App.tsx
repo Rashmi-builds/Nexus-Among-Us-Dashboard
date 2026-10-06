@@ -12,7 +12,6 @@ import {
   KeyRound,
   Shield,
   Search,
-  Zap,
   ExternalLink,
   Volume2,
   VolumeX,
@@ -44,7 +43,6 @@ import { AdminAuthProvider } from './context/AdminAuthContext';
 import { GameAudio } from './utils/gameAudio';
 
 const AmongUsAdmin = lazy(() => import('./pages/AmongUsAdmin'));
-const PlayerMission = lazy(() => import('./pages/PlayerMission'));
 
 // Countdown to TechIdeate'26 Opening Bell: 9 October 2026, 12:00 PM IST
 function useCountdown() {
@@ -494,15 +492,6 @@ function Home() {
                   <span>Register Among Us (₹25) + Get Sherlock FREE!</span>
                   <ArrowUpRight className="w-4 h-4" />
                 </a>
-
-                <Link
-                  to="/play"
-                  onClick={playClick}
-                  className="btn-paper-white py-4 px-5 text-center flex items-center justify-center gap-2 text-xs"
-                >
-                  <Zap className="w-4 h-4 text-neutral-950" />
-                  <span>Mission Console</span>
-                </Link>
               </div>
             </div>
           )}
@@ -1161,11 +1150,6 @@ function MainLayout() {
     location.pathname.startsWith('/amongus-admin') ||
     location.pathname.startsWith('/dashboard');
 
-  const isPlayerRoute =
-    location.pathname.startsWith('/play') ||
-    location.pathname.startsWith('/mission') ||
-    location.pathname.startsWith('/player');
-
   if (isAdminRoute) {
     return (
       <Suspense fallback={<div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center font-mono text-xs text-neutral-600">INITIALIZING OPERATIONS GATEWAY...</div>}>
@@ -1173,18 +1157,6 @@ function MainLayout() {
           <Route path="/admin" element={<AmongUsAdmin />} />
           <Route path="/dashboard" element={<AmongUsAdmin />} />
           <Route path="/amongus-admin" element={<AmongUsAdmin />} />
-        </Routes>
-      </Suspense>
-    );
-  }
-
-  if (isPlayerRoute) {
-    return (
-      <Suspense fallback={<div className="min-h-screen bg-[#030611] flex items-center justify-center font-mono text-xs text-cyan-400">CONNECTING TO MISSION DECK...</div>}>
-        <Routes>
-          <Route path="/play" element={<PlayerMission />} />
-          <Route path="/mission" element={<PlayerMission />} />
-          <Route path="/player" element={<PlayerMission />} />
         </Routes>
       </Suspense>
     );
@@ -1221,15 +1193,6 @@ function MainLayout() {
             <a href="#enlist" className="text-neutral-700 hover:text-neutral-950 transition uppercase hidden sm:inline font-bold">
               [ENLIST]
             </a>
-
-            {/* Direct Player Mission Link */}
-            <Link
-              to="/play"
-              className="btn-paper-white px-3.5 py-2 text-xs flex items-center gap-1.5"
-            >
-              <Zap className="w-3.5 h-3.5 text-neutral-950" />
-              <span>Player Deck</span>
-            </Link>
 
             {/* Direct Register Button with 1+1 FREE highlight */}
             <a
@@ -1270,7 +1233,6 @@ function MainLayout() {
               <a href="#dossiers" className="hover:text-neutral-950 transition">Classified Dossiers</a>
               <a href="#enlist" className="hover:text-neutral-950 transition">How to Register</a>
               <a href="#contact" className="hover:text-neutral-950 transition">Coordinators</a>
-              <Link to="/play" className="text-red-600 hover:text-red-700 transition">Player Deck</Link>
             </div>
           </div>
 

@@ -10,7 +10,6 @@ import {
   Edit,
   Eye,
   EyeOff,
-  LogOut,
   AlertTriangle,
   Lock,
   Unlock,
@@ -57,7 +56,7 @@ const ROOM_METADATA: Record<RoomType, { code: string; icon: string; description:
 };
 
 export default function AmongUsAdmin() {
-  const { user, permissions, login, logout, isAuthenticated } = useAdminAuth();
+  const { user, permissions, login, isAuthenticated } = useAdminAuth();
 
   // Primary Collections from Database
   const [teams, setTeams] = useState<Team[]>(INITIAL_ADMIN_TEAMS);
@@ -140,6 +139,7 @@ export default function AmongUsAdmin() {
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   // ============================================================================
   // DATABASE HYDRATION & REALTIME SUBSCRIPTIONS
@@ -725,30 +725,42 @@ export default function AmongUsAdmin() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#f8f9fa] text-neutral-900 flex items-center justify-center p-6">
-        <div className="w-full max-w-md bg-white border border-neutral-300 rounded-3xl p-8 sm:p-10 shadow-sm">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl border border-neutral-200 bg-white p-1 mx-auto mb-4 shadow-sm flex items-center justify-center">
+      <div className="relative min-h-screen overflow-hidden bg-neutral-950 text-white flex items-center justify-center p-6">
+        <div className="pointer-events-none absolute inset-0 opacity-30">
+          <div className="absolute -left-32 -top-32 h-80 w-80 rounded-full bg-black shadow-[0_0_120px_#000000]" />
+          <div className="absolute -bottom-40 -right-24 h-96 w-96 rounded-full bg-neutral-900 shadow-[0_0_140px_#111111]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:32px_32px]" />
+        </div>
+
+        <div className="relative w-full max-w-md bg-white text-neutral-900 border border-neutral-700 rounded-3xl p-7 shadow-2xl sm:p-10">
+          <div className="mb-8 flex items-center gap-4">
+            <div className="w-14 h-14 shrink-0 rounded-2xl border border-neutral-200 bg-white p-1 shadow-sm flex items-center justify-center">
               <img
                 src="/logo.jpeg"
                 alt="NEXUS Insignia"
                 className="w-full h-full object-contain rounded-xl"
               />
             </div>
-            <span className="text-[11px] font-mono uppercase tracking-widest text-neutral-500 block mb-1">
-              NEXUS OPERATIONS GATE
-            </span>
-            <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
-              Admin Login
-            </h1>
-            <p className="text-xs text-neutral-500 mt-1">
-              Enter your credentials to enter the operations deck
+            <div>
+              <span className="text-[10px] font-mono font-bold uppercase tracking-[0.24em] text-neutral-500">
+                NEXUS OPERATIONS GATE
+              </span>
+              <h1 className="mt-1 text-2xl font-bold tracking-tight text-neutral-950">
+                Admin Login
+              </h1>
+            </div>
+          </div>
+
+          <div className="mb-7 border-l-2 border-black pl-4">
+            <p className="text-sm font-semibold text-neutral-800">Secure facilitator access</p>
+            <p className="text-xs leading-relaxed text-neutral-500">
+              Enter your clearance credentials to access the operations deck.
             </p>
           </div>
 
           {loginError && (
-            <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
+            <div className="mb-5 p-3.5 rounded-xl border border-red-200 bg-red-50 text-xs font-semibold leading-relaxed text-red-700 flex items-start gap-2.5" role="alert">
+              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-red-600" />
               <span>{loginError}</span>
             </div>
           )}
@@ -767,43 +779,77 @@ export default function AmongUsAdmin() {
             className="space-y-4"
           >
             <div>
-              <label className="text-xs font-bold text-neutral-700 block mb-1.5 uppercase tracking-wider">
-                Username / Facilitator ID
+              <label className="text-xs font-bold text-neutral-700 block mb-1.5 uppercase tracking-wider" htmlFor="admin-login-id">
+                Facilitator ID
               </label>
               <input
+                id="admin-login-id"
                 type="text"
-                placeholder="Enter username"
+                placeholder="e.g. NX-SUPER-01"
                 value={loginId}
                 onChange={e => setLoginId(e.target.value)}
-                className="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-black placeholder:text-neutral-400 transition"
+                className="w-full border border-neutral-300 bg-neutral-50 px-4 py-3 text-sm text-neutral-900 rounded-xl outline-none transition placeholder:text-neutral-400 focus:border-black focus:bg-white focus:ring-2 focus:ring-black/10"
                 required
                 autoComplete="username"
+                autoCapitalize="characters"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-neutral-700 block mb-1.5 uppercase tracking-wider">
-                Password
-              </label>
-              <input
-                type="password"
-                placeholder="••••••••••••"
-                value={loginPassword}
-                onChange={e => setLoginPassword(e.target.value)}
-                className="w-full bg-white border border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-black font-mono placeholder:text-neutral-400 transition"
-                required
-                autoComplete="current-password"
-              />
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider" htmlFor="admin-login-password">
+                  Security Passcode
+                </label>
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                  Encrypted session
+                </span>
+              </div>
+              <div className="relative">
+                <input
+                  id="admin-login-password"
+                  type={showLoginPassword ? 'text' : 'password'}
+                  placeholder="Enter your passcode"
+                  value={loginPassword}
+                  onChange={e => setLoginPassword(e.target.value)}
+                  className="w-full border border-neutral-300 bg-neutral-50 px-4 py-3 pr-12 text-sm text-neutral-900 rounded-xl outline-none transition placeholder:text-neutral-400 focus:border-black focus:bg-white focus:ring-2 focus:ring-black/10 font-mono"
+                  required
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowLoginPassword(value => !value)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-neutral-400 hover:text-neutral-900 rounded-lg transition"
+                  aria-label={showLoginPassword ? 'Hide password' : 'Show password'}
+                  title={showLoginPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={isLoggingIn}
-              className="w-full py-3.5 bg-black text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-neutral-800 active:scale-98 transition shadow-sm mt-3 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-black text-white font-bold text-xs uppercase tracking-[0.16em] rounded-xl hover:bg-neutral-800 active:scale-[0.99] transition shadow-sm mt-3 disabled:cursor-not-allowed disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              {isLoggingIn ? 'Verifying Credentials...' : 'Sign In'}
+              {isLoggingIn ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  Verifying Credentials...
+                </>
+              ) : (
+                <>
+                  <Lock className="w-4 h-4" />
+                  Sign In
+                </>
+              )}
             </button>
           </form>
+
+          <div className="mt-7 flex items-center justify-center gap-2 border-t border-neutral-100 pt-5 text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+            <Shield className="w-3.5 h-3.5" />
+            Restricted access • Session monitored
+          </div>
         </div>
       </div>
     );
@@ -839,19 +885,8 @@ export default function AmongUsAdmin() {
             </div>
           </div>
 
-          {/* Facilitator Clearance Identity & User Controls */}
+          {/* Facilitator Clearance Identity */}
           <div className="flex items-center gap-3">
-            <a
-              href="/play"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border border-neutral-200 rounded-lg text-xs font-semibold shadow-xs transition"
-              title="Launch Mobile Player Deck in new window"
-            >
-              <span>Player Deck</span>
-              <span className="text-[10px]">↗</span>
-            </a>
-
             <div className="flex items-center gap-3 pl-3 border-l border-neutral-200">
               <div className="text-right">
                 <div className="flex items-center justify-end gap-1.5">
@@ -866,15 +901,6 @@ export default function AmongUsAdmin() {
                   {permissions?.levelName}
                 </div>
               </div>
-
-              <button
-                onClick={logout}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 text-neutral-700 hover:text-black rounded-lg text-xs font-semibold transition"
-                title="Log Out Clearance Session"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Log Out</span>
-              </button>
             </div>
           </div>
         </div>
